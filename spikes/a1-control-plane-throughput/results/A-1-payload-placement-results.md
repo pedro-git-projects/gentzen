@@ -1,4 +1,4 @@
-# A-1 — Payload Placement: Is Claim Cost Independent of Payload Size?
+# A-1 :: Payload Placement: Is Claim Cost Independent of Payload Size?
 
 **Project:** Gentzen
 **Epic:** A-1 — Spike: control-plane throughput ceiling #1
