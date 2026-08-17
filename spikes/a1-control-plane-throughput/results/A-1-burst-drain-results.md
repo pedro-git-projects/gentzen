@@ -1,7 +1,7 @@
-# A-1 — One-Shot Burst Drain: 22,000 Jobs
+# A-1 :: One-Shot Burst Drain: 22,000 Jobs
 
 **Project:** Gentzen
-**Epic:** A-1 — Spike: control-plane throughput ceiling #1
+**Epic:** A-1 :: Spike: control-plane throughput ceiling #1
 **Date:** 2026-08-17
 **Status:** Burst-drain matrix complete. Lifecycle and payload-independence tests still outstanding.
 
@@ -21,13 +21,13 @@ Targets set for this spike:
 |---|---:|---:|
 | Good | ≤ 5 s | ~4,400 jobs/s |
 | Stretch | ≤ 1 s | ~22,000 jobs/s |
-| A-1 headroom requirement | — | 3× the accepted target |
+| A-1 headroom requirement | - | 3× the accepted target |
 
 ---
 
 ## Headline Result
 
-At the best tested configuration — **8 claimers × batch 50** — a 22,000-job burst drains in:
+At the best tested configuration | **8 claimers × batch 50** | a 22,000-job burst drains in:
 
 ```text
 139.9 ms   (median of 5 repetitions)
@@ -46,7 +46,7 @@ The recycle workload could not express this test, so a purpose-built driver was 
 
 ### No recycling
 
-The queue is seeded with exactly 22,000 READY jobs. Nothing puts work back. The run ends the moment the last job is claimed. There is no steady-state window to average over — the measured quantity is **wall-clock time to drain**.
+The queue is seeded with exactly 22,000 READY jobs. Nothing puts work back. The run ends the moment the last job is claimed. There is no steady-state window to average over, the measured quantity is **wall-clock time to drain**.
 
 ### A new driver: `burst/`
 
@@ -92,7 +92,7 @@ failed transactions = 0
 
 Same host as the recycle benchmark: AMD Ryzen 5 7600X (6 cores / 12 threads), ~30.5 GiB RAM, PostgreSQL 18.4 on ext4/NVMe, local Unix-domain socket.
 
-Durability was fully enabled — these are honest durable-commit numbers, not a `fsync=off` result:
+Durability was fully enabled, these are honest durable-commit numbers, not a `fsync=off` result:
 
 ```text
 fsync              = on
@@ -123,7 +123,7 @@ Median of 5 repetitions per cell. Each repetition re-seeds a fresh 22,000-job bu
 | 32 | 10 | 479.5 ms | 45,880 | 4.800 ms | 20.338 ms | 32.942 ms | 56.510 ms | 99.77% |
 | 32 | 50 | 290.0 ms | 75,868 | 12.708 ms | 61.201 ms | 103.668 ms | 155.127 ms | 98.00% |
 
-Latency percentiles cover **productive** claims — transactions that returned at least one job. Empty transactions are reported separately, since a claim that returns nothing did no work and would flatter the percentiles.
+Latency percentiles cover **productive** claims, transactions that returned at least one job. Empty transactions are reported separately, since a claim that returns nothing did no work and would flatter the percentiles.
 
 Run-to-run variance was low. For the winning cell the five drain times were:
 
@@ -149,7 +149,7 @@ At a single claimer, batching alone moves the burst from failing the target to b
 
 That is a **33× improvement from batching alone, on one connection.**
 
-Concurrency does far less. Going from 1 to 8 claimers at batch 50 — eight times the clients — improves drain time only from 236 ms to 140 ms, about **1.7×**. A single claimer with batch 50 already outperforms 32 claimers at batch 1 (806 ms) and 32 claimers at batch 10 (480 ms).
+Concurrency does far less. Going from 1 to 8 claimers at batch 50, eight times the clients, improves drain time only from 236 ms to 140 ms, about **1.7×**. A single claimer with batch 50 already outperforms 32 claimers at batch 1 (806 ms) and 32 claimers at batch 10 (480 ms).
 
 The practical consequence for Gentzen: **a dispatcher that claims in batches matters much more than a dispatcher that runs many workers.** A single well-batched claimer already clears a 22k burst in a quarter of a second.
 
@@ -191,7 +191,7 @@ Several configurations show a `max` latency near 7.6 ms that never appears in p9
 868 ms, 1,868 ms, 3,868 ms, 4,868 ms, 6,868 ms
 ```
 
-— exactly one second apart. At 8 claimers × batch 1, four separate claimers stall within 5 µs of each other at t = 1,013.86 ms, so all backends block simultaneously.
+ exactly one second apart. At 8 claimers × batch 1, four separate claimers stall within 5 µs of each other at t = 1,013.86 ms, so all backends block simultaneously.
 
 The cause has **not** been confirmed and should not be guessed at in a decision document. What matters operationally is the bound: it costs roughly one 7.6 ms hiccup per second, system-wide. At 22k-burst timescales it affects at most one transaction and never reaches p99. It would only become interesting in a sustained low-latency workload, and is worth a follow-up if Gentzen ever targets single-digit-millisecond p999.
 
@@ -209,7 +209,7 @@ A-1 requires roughly 3× throughput headroom. Multiplying the 22k result by thre
 
 Two things stand out.
 
-**Throughput is flat, not degrading.** A 10× burst runs at *higher* jobs/sec than the 22k burst (163k vs 157k), because the fixed cost of starting and finishing a burst amortizes over more work. Even at 45× the production burst, throughput only falls to ~141k jobs/s, and batch fill *improves* to 99.99% — the end-of-burst thrash described below becomes a vanishing fraction of a longer drain.
+**Throughput is flat, not degrading.** A 10× burst runs at *higher* jobs/sec than the 22k burst (163k vs 157k), because the fixed cost of starting and finishing a burst amortizes over more work. Even at 45× the production burst, throughput only falls to ~141k jobs/s, and batch fill *improves* to 99.99%, the end-of-burst thrash described below becomes a vanishing fraction of a longer drain.
 
 **The 3× headroom requirement is met by a wide margin.** A burst **ten times** the production size still drains in 1.35 s, comfortably inside the 5 s good target and close to the 1 s stretch target. Checkpoint pressure remains absent (0 requested checkpoints) even for the 1M-job burst.
 
@@ -233,7 +233,7 @@ A 22,000-job burst is physically cheap. Per repetition, at 8×50:
 
 The relation roughly doubles, which is expected: the claim is a non-HOT update, so every row briefly exists as both a dead and a live version until vacuum runs. Nothing here approaches the 1 GB working set the recycle torture test produced, because the burst performs 22,000 updates rather than 31 million.
 
-WAL cost per job varies mildly with configuration — from ~510 B/job at 1×10 to ~739 B/job at 32×50 — tracking how many full-page images the write pattern triggers. None of it is close to a constraint: the entire burst fits in ~12 MB of WAL and triggers no checkpoints at all.
+WAL cost per job varies mildly with configuration, from ~510 B/job at 1×10 to ~739 B/job at 32×50, tracking how many full-page images the write pattern triggers. None of it is close to a constraint: the entire burst fits in ~12 MB of WAL and triggers no checkpoints at all.
 
 ---
 
@@ -255,7 +255,7 @@ The burst that currently takes tens of minutes and sometimes fails drains in **u
 8 claimers x batch 50
 ```
 
-8 claimers is the sweet spot on a 6-core host; the useful claimer count is bounded by cores, not by the queue. Batch size is the lever worth tuning first. If tail latency matters more than raw drain time, **8 × batch 10** gives 195 ms with a p99 of 1.15 ms — a 39% slower drain for a **3.8× better p99**.
+8 claimers is the sweet spot on a 6-core host; the useful claimer count is bounded by cores, not by the queue. Batch size is the lever worth tuning first. If tail latency matters more than raw drain time, **8 × batch 10** gives 195 ms with a p99 of 1.15 ms, a 39% slower drain for a **3.8× better p99**.
 
 ---
 
