@@ -1,0 +1,9 @@
+.state/
+
+# Raw run directories are large and regenerable; the written-up results are not.
+results/*
+!results/.gitkeep
+!results/*.md
+
+# Compiled burst driver.
+burst/a1burst
