@@ -1,7 +1,7 @@
-# A-1 — Payload Placement: Is Claim Cost Independent of Payload Size?
+# A-1 :: Payload Placement: Is Claim Cost Independent of Payload Size?
 
 **Project:** Gentzen
-**Epic:** A-1 — Spike: control-plane throughput ceiling #1
+**Epic:** A-1 :: Spike: control-plane throughput ceiling #1
 **Date:** 2026-08-17
 **Status:** Complete for the claim path and for ingest. Completion/deletion lifecycle still outstanding.
 

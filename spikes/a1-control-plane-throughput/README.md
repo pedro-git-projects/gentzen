@@ -1,4 +1,4 @@
-# A-1 — Spike: Control-Plane Throughput Ceiling
+# A-1 :: Spike: Control-Plane Throughput Ceiling
 
 Can PostgreSQL be Gentzen's durable control-plane job queue?
 

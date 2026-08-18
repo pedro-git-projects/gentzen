@@ -1,7 +1,7 @@
-# A-1 — Control-Plane Throughput Spike: Initial Results
+# A-1 :: Control-Plane Throughput Spike: Initial Results
 
 **Project:** Gentzen  
-**Epic:** A-1 — Spike: control-plane throughput ceiling #1  
+**Epic:** A-1 :: Spike: control-plane throughput ceiling #1  
 **Date:** 2026-08-16  
 **Status:** Initial diagnostic results; acceptance matrix not yet complete
 
